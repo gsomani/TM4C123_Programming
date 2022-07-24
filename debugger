@@ -1,0 +1,22 @@
+#!/bin/bash
+
+OPENOCD_PATH=$1
+ELF=$2
+
+# location of OpenOCD Board .cfg files
+OPENOCD_BOARD_DIR=$OPENOCD_PATH/openocd/scripts/board
+
+# start xterm with openocd in the background
+xterm -e openocd -f $OPENOCD_BOARD_DIR/ek-tm4c123gxl.cfg &
+
+# save the PID of the background process
+XTERM_PID=$!
+
+# wait a bit to be sure the hardware is ready
+sleep 2
+
+# execute some initialisation commands via gdb
+arm-none-eabi-gdb --batch --command=init.gdb $ELF
+
+# close xterm when the user has exited nemiver
+kill $XTERM_PID
